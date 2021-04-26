@@ -1,16 +1,29 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="text-center">
+    <button>Start</button>
+  </div>
+  <div class="game-container">
+    <section class="player-hand">
+      <h1>Player 1</h1>
+      <Card :rank="'A'" :suit="'clubs'" />
+    </section>
+    <section class="deck-area">
+      <button>Take Deck</button>
+    </section>
+    <section class="player-hand">
+      <h1>Player 2</h1>
+    </section>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Card from './components/Card'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+    Card,
+  },
 }
 </script>
 
@@ -19,8 +32,22 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.game-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px;
+}
+
+.deck-area {
+  width: 400px;
+  text-align: center;
 }
 </style>
