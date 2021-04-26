@@ -7,9 +7,9 @@
       <h1>Player 1</h1>
       <Card 
         v-for="card in playerHand" 
-        :rank="card.rank" 
-        :suit="card.suit" 
-        :key="card.rank + '' + card.suit" />
+        :key="card.rank + '' + card.suit"
+        :card="card"
+      />
     </section>
     <section class="deck-area">
       <button>Take Deck</button>

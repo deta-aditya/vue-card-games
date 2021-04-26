@@ -1,30 +1,28 @@
 <template>
   <div class="card" :class="cardColor">
-    {{rank}} <span v-html="suitSymbol"></span>
+    {{card.rank}} <span v-html="suitSymbol"></span>
   </div>
 </template>
 
 <script>
-import { CLUB, DIAMOND, HEART, RANKS, SPADE, SUITS } from "../constants/cards"
+import { CLUB, DIAMOND, HEART, SPADE } from "../constants/cards"
+import { isValidCard } from '../models/card'
 
 export default {
   props: {
-    rank: {
-      validator: value => RANKS.includes(value)
+    card: {
+      validator: value => isValidCard(value)
     },
-    suit: {
-      validator: value => SUITS.includes(value)
-    }
   },
   computed: {
     suitSymbol() {
-      return `&${this.suit};`
+      return `&${this.card.suit};`
     },
 
     cardColor() {
       return {
-        'black-suit': this.suit === SPADE || this.suit === CLUB,
-        'red-suit': this.suit === HEART || this.suit === DIAMOND,
+        'black-suit': this.card.suit === SPADE || this.card.suit === CLUB,
+        'red-suit': this.card.suit === HEART || this.card.suit === DIAMOND,
       }
     }
   }
