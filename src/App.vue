@@ -3,13 +3,11 @@
     <button @click="startGame">Start</button>
   </div>
   <div class="game-container">
-    <player-hand :name="'Player 1'" :hand="playerHand" />
+    <player-hand :name="'Player 1'" :hand="playerHands[0]" />
     <section class="deck-area">
       <button>Take Deck</button>
     </section>
-    <section class="player-hand">
-      <h1>Player 2</h1>
-    </section>
+    <player-hand :name="'Player 2'" :hand="playerHands[1]" />
   </div>
 </template>
 
@@ -26,11 +24,8 @@ export default {
   data() {
     return {
       deck: [],
-      playerHand: [],
+      playerHands: [[], []],
     }
-  },
-  mounted() {
-    
   },
   methods: {
     startGame() {
@@ -49,9 +44,11 @@ export default {
 
     distributeHand() {
       const cardsPerPlayer = 7
-      this.playerHand = this.deck.slice(0, cardsPerPlayer)
-      this.deck = this.deck.slice(cardsPerPlayer, this.deck.length)
-    }
+      this.playerHands.forEach((_, idx) => {
+        this.playerHands[idx] = this.deck.slice(0, cardsPerPlayer)
+        this.deck = this.deck.slice(cardsPerPlayer, this.deck.length)
+      })
+    },
   }
 }
 </script>
