@@ -58,7 +58,7 @@ export default {
     },
 
     start() {
-      this.$emit('start', this.playerNames)
+      this.$emit('start', [...this.playerNames])
     }
   }
 }

@@ -5,7 +5,7 @@ export function createCard(rank, suit) {
 }
 
 export function isValidCard(card) {
-  return ['suit', 'rank'].includes(Object.keys(card)) 
+  return Object.keys(card).every(['suit', 'rank'].includes)
     && SUITS.includes(card.suit) 
     && RANKS.includes(card.rank)
 }

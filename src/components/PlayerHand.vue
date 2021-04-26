@@ -11,7 +11,7 @@
 
 <script>
 import Card from './Card'
-import { isValidCard } from "../models/card"
+// import { isValidCard } from "../models/card"
 
 export default {
   components: {
@@ -23,9 +23,10 @@ export default {
       required: true,
     },
     hand: {
-      validator(value) {
-        return Array.isArray(value) && value.every(isValidCard)
-      }
+      type: Array,
+      // validator(value) {
+      //   return Array.isArray(value) && value.every(isValidCard)
+      // }
     }
   },
   methods: {

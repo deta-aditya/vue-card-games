@@ -6,13 +6,11 @@
 
 <script>
 import { CLUB, DIAMOND, HEART, SPADE } from "../constants/cards"
-import { isValidCard } from '../models/card'
+// import { isValidCard } from '../models/card'
 
 export default {
   props: {
-    card: {
-      validator: value => isValidCard(value)
-    },
+    card: Object,
   },
   computed: {
     suitSymbol() {

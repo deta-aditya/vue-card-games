@@ -1,40 +1,38 @@
 <template>
   <main-menu 
-    v-show="state === MAIN_MENU" 
-    @started="toStartingGame" />
+    v-if="state === MAIN_MENU" 
+    @started="toStartingGame"
+  />
   <starting-game 
-    v-show="state === STARTING_GAME" 
+    v-if="state === STARTING_GAME" 
     @start="toStartGame" 
-    @back="toMainMenu" />
-  <div v-show="state === INGAME" class="game-container">
-    <player-hand :name="'Player 1'" :hand="playerHands[0]" />
-    <section class="deck-area">
-      <button>Take Deck</button>
-    </section>
-    <player-hand :name="'Player 2'" :hand="playerHands[1]" />
-  </div>
+    @back="toMainMenu" 
+  />
+  <game 
+    v-if="state === INGAME" 
+    :settings="currentGameSettings"
+  />
 </template>
 
 <script>
-import MainMenu from './components/MainMenu.vue';
-import PlayerHand from './components/PlayerHand'
-import StartingGame from './components/StartingGame.vue';
-import { MAIN_MENU, STARTING_GAME, INGAME } from "./constants/game-status";
-import { RANKS } from './constants/ranks'
-import { SUITS } from './constants/suits'
+import Game from './components/Game.vue'
+import MainMenu from './components/MainMenu.vue'
+import StartingGame from './components/StartingGame.vue'
+import { MAIN_MENU, STARTING_GAME, INGAME } from "./constants/game-status"
 
 export default {
   name: 'App',
   components: {
-    PlayerHand,
     MainMenu,
     StartingGame,
+    Game,
   },
   data() {
     return {
       state: MAIN_MENU,
-      deck: [],
-      playerHands: [[], []],
+      currentGameSettings: {
+        players: []
+      }
     }
   },
   created() {
@@ -51,31 +49,15 @@ export default {
       this.state = MAIN_MENU
     },
 
-    toStartGame() {
+    toStartGame(players) {
+      this.currentGameSettings = {
+        players: players.map(name => ({ 
+          name, 
+          hand: [],
+        }))
+      }
+      
       this.state = INGAME
-      this.startGame()
-    },
-
-    startGame() {
-      this.initializeDeck()
-      this.shuffleDeck()
-      this.distributeHand()
-    },
-
-    initializeDeck() {
-      this.deck = SUITS.flatMap(suit => RANKS.map(rank => ({ suit, rank })))
-    },
-
-    shuffleDeck() {
-      this.deck = this.deck.sort(() => Math.random() - 0.5)
-    },
-
-    distributeHand() {
-      const cardsPerPlayer = 7
-      this.playerHands.forEach((_, idx) => {
-        this.playerHands[idx] = this.deck.slice(0, cardsPerPlayer)
-        this.deck = this.deck.slice(cardsPerPlayer, this.deck.length)
-      })
     },
   }
 }
