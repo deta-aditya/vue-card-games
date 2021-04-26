@@ -3,14 +3,7 @@
     <button @click="startGame">Start</button>
   </div>
   <div class="game-container">
-    <section class="player-hand">
-      <h1>Player 1</h1>
-      <Card 
-        v-for="card in playerHand" 
-        :key="card.rank + '' + card.suit"
-        :card="card"
-      />
-    </section>
+    <player-hand :name="'Player 1'" :hand="playerHand" />
     <section class="deck-area">
       <button>Take Deck</button>
     </section>
@@ -21,14 +14,14 @@
 </template>
 
 <script>
-import Card from './components/Card'
+import PlayerHand from './components/PlayerHand'
 import { RANKS } from './constants/ranks'
 import { SUITS } from './constants/suits'
 
 export default {
   name: 'App',
   components: {
-    Card,
+    PlayerHand,
   },
   data() {
     return {
