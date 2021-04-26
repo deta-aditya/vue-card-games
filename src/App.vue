@@ -6,6 +6,9 @@
     <section class="player-hand">
       <h1>Player 1</h1>
       <Card :rank="'A'" :suit="'clubs'" />
+      <Card :rank="'K'" :suit="'hearts'" />
+      <Card :rank="'10'" :suit="'spades'" />
+      <Card :rank="'3'" :suit="'diams'" />
     </section>
     <section class="deck-area">
       <button>Take Deck</button>

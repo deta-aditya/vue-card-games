@@ -1,11 +1,11 @@
 <template>
-  <div class="card" :style="cardColor">
+  <div class="card" :class="cardColor">
     {{rank}} <span v-html="suitSymbol"></span>
   </div>
 </template>
 
 <script>
-import { CLUB, RANKS, SPADE, SUITS } from "../constants/cards"
+import { CLUB, DIAMOND, HEART, RANKS, SPADE, SUITS } from "../constants/cards"
 
 export default {
   props: {
@@ -22,10 +22,9 @@ export default {
     },
 
     cardColor() {
-      if (this.suit === SPADE || this.suit === CLUB) {
-        return { color: 'black' }
-      } else {
-        return { color: 'red '}
+      return {
+        'black-suit': this.suit === SPADE || this.suit === CLUB,
+        'red-suit': this.suit === HEART || this.suit === DIAMOND,
       }
     }
   }
@@ -33,5 +32,11 @@ export default {
 </script>
 
 <style>
+.black-suit {
+  color: black;
+}
 
+.red-suit {
+  color: red;
+}
 </style>
