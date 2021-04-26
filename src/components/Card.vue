@@ -28,6 +28,17 @@ export default {
 </script>
 
 <style>
+.card {
+  border: 1px solid #DDD;
+  padding: 5px;
+  width: 50px;
+  height: 60px;
+  font-size: 18pt;
+  margin-bottom: 5px;
+  box-shadow: 0px 2px 3px 1px #aaa;
+  background: white;
+}
+
 .black-suit {
   color: black;
 }

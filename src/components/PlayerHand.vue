@@ -1,11 +1,14 @@
 <template>
-  <section class="player-hand">
+  <section class="player">
     <h1>{{name}}</h1>
-    <card 
-      v-for="card in hand" 
-      :key="card.rank + '' + card.suit"
-      :card="card"
-    />
+    <div class="hand">
+      <card 
+        v-for="(card, idx) in hand" 
+        :key="card.rank + '' + card.suit"
+        :card="card"
+        :style="{ position: 'absolute', top: `${50 * idx}px` }"
+      />
+    </div>
   </section>
 </template>
 
@@ -35,5 +38,7 @@ export default {
 </script>
 
 <style>
-
+.hand {
+  position: relative;
+}
 </style>
