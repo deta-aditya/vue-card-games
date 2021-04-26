@@ -1,12 +1,14 @@
 <template>
-  <section class="player">
-    <h1>{{name}}</h1>
+  <section class="player" :class="conditionalClass">
+    <h1>{{player.name}}</h1>
     <div class="hand">
       <card 
-        v-for="(card, idx) in hand" 
-        :key="card.rank + '' + card.suit"
+        v-for="(card, idx) in player.hand" 
+        :key="idx"
         :card="card"
+        :enabled="shouldEnable(card)"
         :style="{ position: 'absolute', top: `${50 * idx}px` }"
+        @select="$emit('play', card)"
       />
     </div>
   </section>
@@ -21,18 +23,37 @@ export default {
     Card,
   },
   props: {
-    name: {
-      type: String,
-      required: true,
+    player: {
+      type: Object,
     },
-    hand: {
-      type: Array,
+    // name: {
+    //   type: String,
+    //   required: true, 
+    // },
+    // hand: {
+    //   type: Array,
       // validator(value) {
       //   return Array.isArray(value) && value.every(isValidCard)
       // }
+    // },
+    isTurn: {
+      type: Boolean,
+      default: false,
+    },
+    activeSuit: {
+      default: null,
     }
   },
+  emits: ['play'],
+  computed: {
+    conditionalClass() {
+      return { 'is-turn': this.isTurn }
+    },
+  },
   methods: {
+    shouldEnable(card) {
+      return this.isTurn && (this.activeSuit === null || card.suit === this.activeSuit)
+    }
   }
 }
 </script>
@@ -40,5 +61,9 @@ export default {
 <style>
 .hand {
   position: relative;
+}
+
+.is-turn h1 {
+  color: red;
 }
 </style>

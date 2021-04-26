@@ -12,4 +12,4 @@ export const JACK = 'J'
 export const QUEEN = 'Q'
 export const KING = 'K'
 
-export const RANKS = [ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING]
+export const RANKS = [TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE]

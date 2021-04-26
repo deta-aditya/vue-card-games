@@ -56,7 +56,7 @@ export default {
           hand: [],
         }))
       }
-      
+
       this.state = INGAME
     },
   }
@@ -73,17 +73,6 @@ export default {
 }
 
 .text-center {
-  text-align: center;
-}
-
-.game-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 50px;
-}
-
-.deck-area {
-  width: 400px;
   text-align: center;
 }
 </style>
