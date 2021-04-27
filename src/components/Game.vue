@@ -233,6 +233,7 @@ export default {
 
 .placed {
   display: flex;
+  justify-content: center;
 }
 
 .winner-placeholder {
