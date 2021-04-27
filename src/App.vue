@@ -19,7 +19,7 @@
 import Game from './components/Game.vue'
 import MainMenu from './components/MainMenu.vue'
 import StartingGame from './components/StartingGame.vue'
-import { MAIN_MENU, STARTING_GAME, INGAME } from "./constants/game-status"
+import { MAIN_MENU, STARTING_GAME, INGAME } from "./constants/status"
 
 export default {
   name: 'App',

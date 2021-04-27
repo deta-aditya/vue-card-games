@@ -8,6 +8,7 @@
     <section class="table">
       <div v-show="!gameOver" class="deck-placeholder">
         <button v-show="currentPlayerShouldDig" @click="digDeck">Dig!</button>
+        <button v-show="isDeckExhausted">Take</button>
       </div>
       <div v-show="!gameOver" class="placed">
         <template v-for="(card, idx) in placed" :key="idx">
@@ -15,7 +16,7 @@
         </template>
       </div>
       <div class="winner-placeholder" v-show="gameOver">
-        <h1>{{ winningPlayer.name }} Win!</h1>
+        <h1>{{ winner.name }} Win!</h1>
         <div>
           <button @click="restartGame">Play Again</button>
           <button @click="exitGame">Main Menu</button>
@@ -40,7 +41,6 @@ const defaultState = {
   turn: -1,
   placed: [],
   deck: [],
-  gameWinner: -1,
 }
 
 export default {
@@ -63,9 +63,9 @@ export default {
       const anyPlacedCard = this.placed.find(card => card !== null)
       if (anyPlacedCard === undefined) {
         return null
-      } else {
-        return anyPlacedCard.suit
       }
+      
+      return anyPlacedCard.suit
     },
 
     allPlaced() {
@@ -76,17 +76,35 @@ export default {
       return this.players[this.turn]
     },
 
+    currentPlayerhasNoActiveSuit() {
+      return this.currentPlayer.hand.every(card => card.suit !== this.activeSuit)
+    },
+
     currentPlayerShouldDig() {
-      return this.activeSuit !== null && 
-        this.currentPlayer.hand.every(card => card.suit !== this.activeSuit)
+      return this.activeSuit !== null 
+        && this.currentPlayerhasNoActiveSuit
+        && ! this.isDeckExhausted
+    },
+
+    isDeckExhausted() {
+      return this.deck.length === 0
     },
 
     gameOver() {
-      return this.gameWinner >= 0
+      return this.winnerIndex >= 0
     },
 
-    winningPlayer() {
-      return this.players[this.gameWinner] ?? {}
+    winner() {
+      return this.players[this.winnerIndex] ?? {}
+    },
+
+    winnerIndex() {
+      return this.players.reduce((previous, current, idx) => { 
+        if (current.hand.length === 0) {
+          return idx
+        }
+        return previous
+      }, -1)
     },
   },
   methods: {
@@ -145,9 +163,8 @@ export default {
       }
 
       this.placeCard(card)
-      this.checkGameWinner()
 
-      if (this.allPlaced) {
+      if (this.allPlaced && !this.gameOver) {
         this.nextPlay()
       } else {
         this.nextTurn()
@@ -187,15 +204,8 @@ export default {
       this.turn = playWinner
     },
 
-    checkGameWinner() {
-      if (this.currentPlayer.hand.length === 0) {
-        this.gameWinner = this.turn
-      }
-    },
-
     restartGame() {
       this.players = this.players.map(player => ({ ...player, hand: [] }))
-      this.gameWinner = defaultState.gameWinner
       this.startGame()
     },
 

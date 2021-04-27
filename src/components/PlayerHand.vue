@@ -56,7 +56,6 @@ export default {
       const cardsPerPage = 7
       return this.player.hand.reduce((all, current, idx) => {
         if (idx % cardsPerPage === 0) {
-          console.log(idx, 'First')
           return [...all, [current]]
         }
         
@@ -64,8 +63,6 @@ export default {
         const currentPage = [...all[currentIndex], current]
         const allWithoutCurrent = all.filter((_, index) => index !== currentIndex)
 
-        console.log({idx, currentIndex, currentPage, allWithoutCurrent})
-        
         return [...allWithoutCurrent, currentPage]
       }, [])
     }
