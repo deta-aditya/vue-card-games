@@ -16,6 +16,10 @@
       </div>
       <div class="winner-placeholder" v-show="gameOver">
         <h1>{{ winningPlayer.name }} Win!</h1>
+        <div>
+          <button @click="restartGame">Play Again</button>
+          <button>Main Menu</button>
+        </div>
       </div>
     </section>
     <player-hand 
@@ -32,6 +36,13 @@ import { RANKS } from '../constants/ranks'
 import { SUITS } from '../constants/suits'
 import Card from './Card.vue'
 
+const defaultState = {
+  turn: -1,
+  placed: [],
+  deck: [],
+  gameWinner: -1,
+}
+
 export default {
   components: { PlayerHand, Card },
   props: {
@@ -40,10 +51,7 @@ export default {
   data() {
     return {
       ...this.settings,
-      turn: 0,
-      placed: [],
-      deck: [],
-      gameWinner: -1,
+      ...defaultState,
     }
   },
   mounted() {
@@ -86,6 +94,7 @@ export default {
       this.shuffleDeck()
       this.distributeHand()
       this.placeStartingCard()
+      this.setTurnRandomly()
     },
 
     initializeGame() {
@@ -94,7 +103,9 @@ export default {
     },
 
     shuffleDeck() {
-      this.deck = this.deck.sort(() => Math.random() - 0.5)
+      for (let i = 0; i < 5; i++) {
+        this.deck = this.deck.sort(() => Math.random() - 0.5)
+      }
     },
 
     distributeHand() {
@@ -106,6 +117,10 @@ export default {
 
     placeStartingCard() {
       this.placed[this.players.length] = this.takeOneFromDeck()
+    },
+
+    setTurnRandomly() {
+      this.turn = Math.floor(Math.random() * this.players.length)
     },
 
     digDeck() {
@@ -124,6 +139,10 @@ export default {
     },
 
     cardPlayed(card) {
+      if (this.gameOver) {
+        return
+      }
+
       this.placeCard(card)
       this.checkGameWinner()
 
@@ -171,6 +190,12 @@ export default {
       if (this.currentPlayer.hand.length === 0) {
         this.gameWinner = this.turn
       }
+    },
+
+    restartGame() {
+      this.players = this.players.map(player => ({ ...player, hand: [] }))
+      this.gameWinner = defaultState.gameWinner
+      this.startGame()
     },
   }
 }
