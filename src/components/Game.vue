@@ -104,6 +104,24 @@ export default {
         && this.isDeckExhausted
     },
 
+    currentPlayWinner() {
+      const { playWinner } = this.rankedPlacedCards.reduce((prev, current, idx) => {
+        const isThisBigger = current > prev.card
+        const isThisNotFromDeck = idx < this.players.length
+
+        if (isThisBigger && isThisNotFromDeck) {
+          return { playWinner: idx, card: current }
+        }
+        return prev
+      }, { playWinner: -1, card: -1 })
+
+      return playWinner
+    },
+
+    nextTurnShouldLoopBack() {
+      return this.turn + 1 === this.players.length
+    },
+
     gameOver() {
       return this.winnerIndex >= 0
     },
@@ -198,7 +216,7 @@ export default {
     },
 
     nextTurn() {
-      if (this.turn + 1 === this.players.length) {
+      if (this.nextTurnShouldLoopBack) {
         this.turn = 0
       } else {
         this.turn += 1
@@ -206,19 +224,8 @@ export default {
     },
 
     nextPlay() {
-      // const placedCardRanks = this.placedCards.map(card => RANKS.indexOf(card.rank))
-      const { playWinner } = this.rankedPlacedCards.reduce((prev, current, idx) => {
-        const isThisBigger = current > prev.card
-        const isThisNotFromDeck = idx < this.players.length
-
-        if (isThisBigger && isThisNotFromDeck) {
-          return { playWinner: idx, card: current }
-        }
-        return prev
-      }, { playWinner: -1, card: -1 })
-
+      this.turn = this.currentPlayWinner
       this.placed = this.players.map(() => null)
-      this.turn = playWinner
     },
 
     restartGame() {
