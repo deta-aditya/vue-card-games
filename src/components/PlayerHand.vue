@@ -1,15 +1,17 @@
 <template>
   <section class="player" :class="conditionalClass">
     <h1>{{player.name}}</h1>
-    <div class="hand">
-      <card 
-        v-for="(card, idx) in player.hand" 
-        :key="idx"
-        :card="card"
-        :enabled="shouldEnable(card)"
-        :style="{ position: 'absolute', top: `${50 * idx}px` }"
-        @select="$emit('play', card)"
-      />
+    <div class="hand-placeholder">
+      <div v-for="(hand, idx) in paginatedHands" :key="idx" class="hand">
+        <card 
+          v-for="(card, idx) in hand" 
+          :key="idx"
+          :card="card"
+          :enabled="shouldEnable(card)"
+          :style="{ position: 'absolute', top: `${50 * idx}px` }"
+          @select="$emit('play', card)"
+        />
+      </div>
     </div>
   </section>
 </template>
@@ -49,6 +51,24 @@ export default {
     conditionalClass() {
       return { 'is-turn': this.isTurn }
     },
+
+    paginatedHands() {
+      const cardsPerPage = 7
+      return this.player.hand.reduce((all, current, idx) => {
+        if (idx % cardsPerPage === 0) {
+          console.log(idx, 'First')
+          return [...all, [current]]
+        }
+        
+        const currentIndex = Math.floor(idx / cardsPerPage)  
+        const currentPage = [...all[currentIndex], current]
+        const allWithoutCurrent = all.filter((_, index) => index !== currentIndex)
+
+        console.log({idx, currentIndex, currentPage, allWithoutCurrent})
+        
+        return [...allWithoutCurrent, currentPage]
+      }, [])
+    }
   },
   methods: {
     shouldEnable(card) {
@@ -61,6 +81,11 @@ export default {
 <style>
 .hand {
   position: relative;
+  width: 75px;
+}
+
+.hand-placeholder {
+  display: flex;
 }
 
 .is-turn h1 {
