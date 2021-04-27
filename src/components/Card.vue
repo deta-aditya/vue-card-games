@@ -1,12 +1,13 @@
 <template>
   <div class="card" :class="conditionalClass" @click="onClick">
-    {{card.rank}} <span v-html="suitSymbol"></span>
+    <div v-show="!faceDown">
+      {{card.rank}} <span v-html="suitSymbol"></span>
+    </div>
   </div>
 </template>
 
 <script>
 import { CLUB, DIAMOND, HEART, SPADE } from "../constants/cards"
-// import { isValidCard } from '../models/card'
 
 export default {
   props: {
@@ -15,10 +16,10 @@ export default {
       type: Boolean,
       default: true,
     },
-    open: {
+    faceDown: {
       type: Boolean,
-      default: true,
-    }
+      default: false,
+    },
   },
   emits: ['select'],
   computed: {
@@ -31,6 +32,7 @@ export default {
         'black-suit': this.card.suit === SPADE || this.card.suit === CLUB,
         'red-suit': this.card.suit === HEART || this.card.suit === DIAMOND,
         'is-enabled': this.enabled,
+        'is-face-down': this.faceDown,
       }
     }
   },
@@ -59,6 +61,12 @@ export default {
 .is-enabled {
   cursor: pointer;
   background: #fff;
+}
+
+.is-face-down {
+  background-image: url('https://ic.pics.livejournal.com/dailyafirmation/691132/529371/529371_original.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 .black-suit {

@@ -8,6 +8,7 @@
           :key="idx"
           :card="card"
           :enabled="shouldEnable(card)"
+          :faceDown="!isTurn"
           :style="{ position: 'absolute', top: `${50 * idx}px` }"
           @select="$emit('play', card)"
         />
@@ -18,7 +19,6 @@
 
 <script>
 import Card from './Card'
-// import { isValidCard } from "../models/card"
 
 export default {
   components: {
@@ -28,16 +28,6 @@ export default {
     player: {
       type: Object,
     },
-    // name: {
-    //   type: String,
-    //   required: true, 
-    // },
-    // hand: {
-    //   type: Array,
-      // validator(value) {
-      //   return Array.isArray(value) && value.every(isValidCard)
-      // }
-    // },
     isTurn: {
       type: Boolean,
       default: false,
