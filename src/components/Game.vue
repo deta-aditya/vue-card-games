@@ -18,7 +18,7 @@
         <h1>{{ winningPlayer.name }} Win!</h1>
         <div>
           <button @click="restartGame">Play Again</button>
-          <button>Main Menu</button>
+          <button @click="exitGame">Main Menu</button>
         </div>
       </div>
     </section>
@@ -48,6 +48,7 @@ export default {
   props: {
     settings: Object
   },
+  emits: ['exit'],
   data() {
     return {
       ...this.settings,
@@ -197,6 +198,10 @@ export default {
       this.gameWinner = defaultState.gameWinner
       this.startGame()
     },
+
+    exitGame() {
+      this.$emit('exit')
+    }
   }
 }
 </script>

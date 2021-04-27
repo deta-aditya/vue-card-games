@@ -11,6 +11,7 @@
   <game 
     v-if="state === INGAME" 
     :settings="currentGameSettings"
+    @exit="toMainMenu"
   />
 </template>
 
