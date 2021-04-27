@@ -6,7 +6,7 @@
       :activeSuit="activeSuit" 
       @play="cardPlayed" />
     <section class="table">
-      <div class="deck-placeholder">
+      <div v-show="!gameOver" class="deck-placeholder">
         <button v-show="currentPlayerShouldDig" @click="digDeck">Dig!</button>
       </div>
       <div v-show="!gameOver" class="placed">
