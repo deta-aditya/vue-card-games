@@ -8,7 +8,7 @@
     <section class="table">
       <div v-show="!gameOver" class="deck-placeholder">
         <button v-show="currentPlayerShouldDig" @click="digDeck">Dig!</button>
-        <button v-show="isDeckExhausted">Take</button>
+        <button v-show="currentPlayerShouldTake" @click="takeCard">Take</button>
       </div>
       <div v-show="!gameOver" class="placed">
         <template v-for="(card, idx) in placed" :key="idx">
@@ -72,22 +72,36 @@ export default {
       return this.placed.every(card => card !== null)
     },
 
+    placedCards() {
+      return this.placed.filter(card => card !== null)
+    },
+
+    rankedPlacedCards() {
+      return this.placed.map(card => RANKS.indexOf(card?.rank))
+    },
+
     currentPlayer() {
       return this.players[this.turn]
     },
 
-    currentPlayerhasNoActiveSuit() {
+    currentPlayerHasNoActiveSuit() {
       return this.currentPlayer.hand.every(card => card.suit !== this.activeSuit)
-    },
-
-    currentPlayerShouldDig() {
-      return this.activeSuit !== null 
-        && this.currentPlayerhasNoActiveSuit
-        && ! this.isDeckExhausted
     },
 
     isDeckExhausted() {
       return this.deck.length === 0
+    },
+
+    currentPlayerShouldDig() {
+      return this.activeSuit !== null 
+        && this.currentPlayerHasNoActiveSuit
+        && ! this.isDeckExhausted
+    },
+
+    currentPlayerShouldTake() {
+      return this.activeSuit !== null 
+        && this.currentPlayerHasNoActiveSuit
+        && this.isDeckExhausted
     },
 
     gameOver() {
@@ -178,6 +192,11 @@ export default {
         .filter(held => !(held.suit === card.suit && held.rank === card.rank))
     },
 
+    takeCard() {
+      this.currentPlayer.hand = [...this.currentPlayer.hand, ...this.placedCards]
+      this.nextPlay()
+    },
+
     nextTurn() {
       if (this.turn + 1 === this.players.length) {
         this.turn = 0
@@ -187,18 +206,16 @@ export default {
     },
 
     nextPlay() {
-      const { playWinner } = this.placed
-        .map(card => RANKS.indexOf(card.rank))
-        .reduce((prev, current, idx) => {
-          const isThisBigger = current > prev.card
-          const isThisNotFromDeck = idx < this.players.length
+      // const placedCardRanks = this.placedCards.map(card => RANKS.indexOf(card.rank))
+      const { playWinner } = this.rankedPlacedCards.reduce((prev, current, idx) => {
+        const isThisBigger = current > prev.card
+        const isThisNotFromDeck = idx < this.players.length
 
-          if (isThisBigger && isThisNotFromDeck) {
-            return { playWinner: idx, card: current }
-          } else {
-            return prev
-          }
-        }, { playWinner: -1, card: -1 })
+        if (isThisBigger && isThisNotFromDeck) {
+          return { playWinner: idx, card: current }
+        }
+        return prev
+      }, { playWinner: -1, card: -1 })
 
       this.placed = this.players.map(() => null)
       this.turn = playWinner
@@ -211,7 +228,7 @@ export default {
 
     exitGame() {
       this.$emit('exit')
-    }
+    },
   }
 }
 </script>
