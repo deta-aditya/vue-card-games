@@ -8,6 +8,7 @@
       <div v-show="!gameOver" class="placed">
         <template v-for="(card, idx) in placed" :key="idx">
           <card v-if="card !== null" :card="card" />
+          <div v-else class="empty-card-slot"></div>
         </template>
       </div>
       <div class="winner-placeholder" v-show="gameOver">
@@ -26,7 +27,8 @@ import { RANKS } from '../constants/ranks'
 import { SUITS } from '../constants/suits'
 import Card from './Card.vue'
 import GameLayout from './GameLayout.vue'
-import { waitForSeconds } from "../models/timer";
+import { waitForSeconds } from "../models/timer"
+import { playerHasSuitOnHand } from "../models/player"
 
 const defaultState = {
   turn: -1,
@@ -76,7 +78,15 @@ export default {
     },
 
     currentPlayerHasNoActiveSuit() {
-      return this.currentPlayer.hand?.every(card => card.suit !== this.activeSuit) ?? false
+      return ! playerHasSuitOnHand(this.currentPlayer, this.activeSuit)
+    },
+
+    playersActiveSuitAvailability() {
+      return this.players.map(player => playerHasSuitOnHand(player, this.activeSuit))
+    },
+
+    playersPlacementStatus() {
+      return this.placed.map(card => card !== null)
     },
 
     isDeckExhausted() {
@@ -111,6 +121,23 @@ export default {
 
     nextTurnShouldLoopBack() {
       return this.turn + 1 === this.players.length
+    },
+
+    hasPlayersWithActiveSuit() {
+      return this.players.some((_, idx) => this.playersActiveSuitAvailability[idx] && !this.playersPlacementStatus[idx])
+    },
+
+    hasPlayersWhoShouldTake() {
+      return this.activeSuit !== null
+        && this.players.some((_, idx) => !this.playersActiveSuitAvailability[idx] && !this.playersPlacementStatus[idx])
+        && this.isDeckExhausted
+    },
+
+    shouldSkipCurrentPlayer() {
+      const playerWhoTakesCard = this.currentPlayerShouldTake && this.hasPlayersWithActiveSuit 
+      const playerWhoAlreadyPlaced = this.playersPlacementStatus[this.turn] && this.hasPlayersWhoShouldTake
+
+      return playerWhoTakesCard || playerWhoAlreadyPlaced 
     },
 
     gameOver() {
@@ -167,6 +194,7 @@ export default {
 
     digDeck() {
       this.currentPlayer.hand = [...this.currentPlayer.hand, this.takeOneFromDeck()]
+      this.skipIfShould()
     },
 
     takeFromDeck(cards) {
@@ -218,11 +246,18 @@ export default {
       } else {
         this.turn += 1
       }
+      this.skipIfShould()
     },
 
     nextPlay() {
       this.turn = this.currentPlayWinner
       this.placed = this.players.map(() => null)
+    },
+
+    skipIfShould() {
+      if (this.shouldSkipCurrentPlayer) {
+        this.nextTurn()
+      }
     },
 
     restartGame() {
@@ -265,5 +300,13 @@ export default {
 
 .winner-placeholder {
   text-align: center;
+}
+
+.empty-card-slot {
+  border: 1px solid #DDD;
+  padding: 5px;
+  width: 50px;
+  height: 60px;
+  background: #aaa;
 }
 </style>
