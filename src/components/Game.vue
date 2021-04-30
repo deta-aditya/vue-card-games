@@ -3,7 +3,7 @@
     <section class="game-table">
       <div v-show="!gameOver" class="deck-placeholder">
         <button v-show="currentPlayerShouldDig" @click="digDeck">Dig!</button>
-        <button v-show="currentPlayerShouldTake" @click="takeCard">Take</button>
+        <button v-show="currentPlayerShouldTake" @click="takeFromPlaced">Take</button>
       </div>
       <div v-show="!gameOver" class="placed">
         <template v-for="(card, idx) in placed" :key="idx">
@@ -26,6 +26,7 @@ import { RANKS } from '../constants/ranks'
 import { SUITS } from '../constants/suits'
 import Card from './Card.vue'
 import GameLayout from './GameLayout.vue'
+import { waitForSeconds } from "../models/timer";
 
 const defaultState = {
   turn: -1,
@@ -71,11 +72,11 @@ export default {
     },
 
     currentPlayer() {
-      return this.players[this.turn]
+      return this.players[this.turn] ?? {}
     },
 
     currentPlayerHasNoActiveSuit() {
-      return this.currentPlayer.hand.every(card => card.suit !== this.activeSuit)
+      return this.currentPlayer.hand?.every(card => card.suit !== this.activeSuit) ?? false
     },
 
     isDeckExhausted() {
@@ -179,7 +180,7 @@ export default {
       return this.takeFromDeck(1)[0]
     },
 
-    cardPlayed(card) {
+    async cardPlayed(card) {
       if (this.gameOver) {
         return
       }
@@ -187,10 +188,16 @@ export default {
       this.placeCard(card)
 
       if (this.allPlaced && !this.gameOver) {
+        await this.delayBeforeNextPlay()
         this.nextPlay()
       } else {
         this.nextTurn()
       }
+    },
+
+    async delayBeforeNextPlay() {
+      this.turn = defaultState.turn
+      await waitForSeconds(0.5)
     },
 
     placeCard(card) {
@@ -200,7 +207,7 @@ export default {
         .filter(held => !(held.suit === card.suit && held.rank === card.rank))
     },
 
-    takeCard() {
+    takeFromPlaced() {
       this.currentPlayer.hand = [...this.currentPlayer.hand, ...this.placedCards]
       this.nextPlay()
     },
