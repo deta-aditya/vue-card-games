@@ -9,7 +9,7 @@
           :card="card"
           :enabled="shouldEnable(card)"
           :faceDown="!isTurn"
-          :style="{ position: 'absolute', top: `${50 * idx}px` }"
+          :style="cardStyle(idx)"
           @select="$emit('play', card)"
         />
       </div>
@@ -34,12 +34,19 @@ export default {
     },
     activeSuit: {
       default: null,
-    }
+    },
+    horizontal: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['play'],
   computed: {
     conditionalClass() {
-      return { 'is-turn': this.isTurn }
+      return { 
+        'is-turn': this.isTurn,
+        'horizontal': this.horizontal,
+      }
     },
 
     paginatedHands() {
@@ -60,12 +67,24 @@ export default {
   methods: {
     shouldEnable(card) {
       return this.isTurn && (this.activeSuit === null || card.suit === this.activeSuit)
+    },
+
+    cardStyle(pageIndex) {
+      const initialStyle = { position: 'absolute' }
+      const offsetSide = this.horizontal ? 'left' : 'top'
+      const offsetValue = `${50 * pageIndex}px`
+
+      return { ...initialStyle, [offsetSide]: offsetValue, }
     }
   }
 }
 </script>
 
 <style>
+.player.horizontal {
+  min-width: 400px;
+}
+
 .hand {
   position: relative;
   width: 75px;
@@ -77,5 +96,14 @@ export default {
 
 .is-turn h1 {
   color: red;
+}
+
+.horizontal .hand {
+  width: auto;
+  height: 75px;
+}
+
+.horizontal .hand-placeholder {
+  flex-direction: column;
 }
 </style>

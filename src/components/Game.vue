@@ -1,11 +1,6 @@
 <template>
-  <div class="game-container">
-    <player-hand 
-      :player="players[0]" 
-      :isTurn="turn === 0" 
-      :activeSuit="activeSuit" 
-      @play="cardPlayed" />
-    <section class="table">
+  <game-layout :players="players" :turn="turn" :placed="placed" @play="cardPlayed">
+    <section class="game-table">
       <div v-show="!gameOver" class="deck-placeholder">
         <button v-show="currentPlayerShouldDig" @click="digDeck">Dig!</button>
         <button v-show="currentPlayerShouldTake" @click="takeCard">Take</button>
@@ -23,19 +18,14 @@
         </div>
       </div>
     </section>
-    <player-hand 
-      :player="players[1]" 
-      :isTurn="turn === 1" 
-      :activeSuit="activeSuit" 
-      @play="cardPlayed" />
-  </div>
+  </game-layout>
 </template>
 
 <script>
-import PlayerHand from './PlayerHand.vue'
 import { RANKS } from '../constants/ranks'
 import { SUITS } from '../constants/suits'
 import Card from './Card.vue'
+import GameLayout from './GameLayout.vue'
 
 const defaultState = {
   turn: -1,
@@ -44,7 +34,7 @@ const defaultState = {
 }
 
 export default {
-  components: { PlayerHand, Card },
+  components: { Card, GameLayout },
   props: {
     settings: Object
   },
@@ -247,8 +237,13 @@ export default {
   margin-top: 50px;
 }
 
-.table {
+.game-table {
   width: 400px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .deck-placeholder {
@@ -256,6 +251,7 @@ export default {
 }
 
 .placed {
+  margin-top: 30px;
   display: flex;
   justify-content: center;
 }
