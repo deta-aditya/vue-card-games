@@ -3,10 +3,18 @@
     <h1>Start New Game</h1>
     <div class="players">
       <h2>Number of Players</h2>
+      <button 
+        class="add-player-button" 
+        :disabled="isMaxPlayers" 
+        @click="addPlayer"
+      >
+        Add Player
+      </button>
       <div
         class="player-item"
         v-for="(name, idx) in playerNames"
-        :key="idx">
+        :key="idx"
+      >
         <input
           :name="`player-name-${idx + 1}`" 
           :id="`player-name-${n + 1}`" 
@@ -16,7 +24,6 @@
         />
         <button :disabled="isMinPlayers" @click="removePlayer(idx)">&times;</button>
       </div>
-      <button :disabled="isMaxPlayers" @click="addPlayer">Add Player</button>
     </div>
     <div>
       <button @click="$emit('back')">Cancel</button>
@@ -26,6 +33,7 @@
 </template>
 
 <script>
+import { MIN_PLAYERS, MAX_PLAYERS } from "../constants/rules";
 export default {
   emits: ['start', 'back'],
   data() {
@@ -35,10 +43,10 @@ export default {
   },
   computed: {
     isMaxPlayers() {
-      return this.playerNames.length === 7
+      return this.playerNames.length === MAX_PLAYERS
     },
     isMinPlayers() {
-      return this.playerNames.length === 2
+      return this.playerNames.length === MIN_PLAYERS
     },
   },
   methods: {
@@ -79,7 +87,7 @@ export default {
   margin-bottom: 30px;
 }
 
-.player-item {
+.player-item, .add-player-button {
   margin-bottom: 10px;
 }
 </style>
