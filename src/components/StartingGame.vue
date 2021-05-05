@@ -12,17 +12,18 @@
       </button>
       <div
         class="player-item"
-        v-for="(name, idx) in playerNames"
+        v-for="(name, idx) in players"
         :key="idx"
       >
         <input
           :name="`player-name-${idx + 1}`" 
           :id="`player-name-${n + 1}`" 
           :placeholder="`Player ${idx + 1}`"
-          v-model="playerNames[idx]"
+          :value="players[idx]"
+          @input="modifyPlayer({ value: $event.target.value, at: idx })"
           type="text"
         />
-        <button :disabled="isMinPlayers" @click="removePlayer(idx)">&times;</button>
+        <button :disabled="isMinPlayers" @click="removePlayer({ at: idx })">&times;</button>
       </div>
     </div>
     <div>
@@ -33,40 +34,29 @@
 </template>
 
 <script>
-import { MIN_PLAYERS, MAX_PLAYERS } from "../constants/rules";
+import { mapGetters, mapMutations, mapState } from "vuex"
+
 export default {
   emits: ['start', 'back'],
-  data() {
-    return {
-      playerNames: ['Player 1', 'Player 2'],
-    }
-  },
   computed: {
-    isMaxPlayers() {
-      return this.playerNames.length === MAX_PLAYERS
-    },
-    isMinPlayers() {
-      return this.playerNames.length === MIN_PLAYERS
-    },
+    ...mapState('starting', [
+      'rules',
+      'players'
+    ]),
+    ...mapGetters('starting', [
+      'isMaxPlayers',
+      'isMinPlayers'
+    ]),
   },
   methods: {
-    resizePlayerNames(to) {
-      const existingNames = this.playerNames
-      const placeholderNames = Array(Math.max(to - existingNames.length, 0)).fill('')
-
-      this.playerNames = [...existingNames, ...placeholderNames]
-    },
-
-    addPlayer() {
-      this.playerNames = [...this.playerNames, `Player ${this.playerNames.length + 1}`]
-    },
-
-    removePlayer(at) {
-      this.playerNames = this.playerNames.filter((_, idx) => idx !== at)
-    },
+    ...mapMutations('starting', {
+      addPlayer: 'ADD_PLAYER',
+      removePlayer: 'REMOVE_PLAYER',
+      modifyPlayer: 'MODIFY_PLAYER',
+    }),
 
     start() {
-      this.$emit('start', [...this.playerNames])
+      this.$emit('start')
     }
   }
 }

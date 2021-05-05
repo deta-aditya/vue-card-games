@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Game from './components/Game.vue'
 import MainMenu from './components/MainMenu.vue'
 import StartingGame from './components/StartingGame.vue'
@@ -31,11 +32,18 @@ export default {
   data() {
     return {
       state: MAIN_MENU,
-      currentGameSettings: {
-        players: []
-      }
     }
   },
+  computed: mapState({
+    currentGameSettings: ({ starting }) => {
+      const players = starting.players.map(name => ({ name, hand: [] }))
+
+      return {
+        ...starting,
+        players
+      }
+    }
+  }),
   created() {
     this.MAIN_MENU = MAIN_MENU
     this.STARTING_GAME = STARTING_GAME
@@ -50,14 +58,7 @@ export default {
       this.state = MAIN_MENU
     },
 
-    toStartGame(players) {
-      this.currentGameSettings = {
-        players: players.map(name => ({ 
-          name, 
-          hand: [],
-        }))
-      }
-
+    toStartGame() {
       this.state = INGAME
     },
   }
