@@ -10,7 +10,7 @@
           :enabled="shouldEnable(card)"
           :faceDown="!isTurn"
           :style="cardStyle(idx)"
-          @select="$emit('play', card)"
+          @select="playCard({ card })"
         />
       </div>
     </div>
@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Card from './Card'
 
 export default {
@@ -25,23 +26,33 @@ export default {
     Card,
   },
   props: {
-    player: {
-      type: Object,
-    },
-    isTurn: {
-      type: Boolean,
-      default: false,
-    },
-    activeSuit: {
-      default: null,
+    playerIndex: {
+      type: Number,
+      required: true,
     },
     horizontal: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ['play'],
   computed: {
+    ...mapState('game', [
+      'turn',
+    ]),
+
+    ...mapGetters('game', [
+      'activeSuit',
+      'getPlayerByIndex',
+    ]),
+
+    player() {
+      return this.getPlayerByIndex(this.playerIndex)
+    },
+
+    isTurn() {
+      return this.turn === this.playerIndex
+    },
+
     conditionalClass() {
       return { 
         'is-turn': this.isTurn,
@@ -65,6 +76,10 @@ export default {
     }
   },
   methods: {
+    ...mapActions('game', [
+      'playCard',
+    ]),
+
     shouldEnable(card) {
       return this.isTurn && (this.activeSuit === null || card.suit === this.activeSuit)
     },
@@ -75,7 +90,7 @@ export default {
       const offsetValue = `${50 * pageIndex}px`
 
       return { ...initialStyle, [offsetSide]: offsetValue, }
-    }
+    },
   }
 }
 </script>

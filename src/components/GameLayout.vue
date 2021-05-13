@@ -3,7 +3,6 @@ import { h } from 'vue'
 import PlayerHandVue from './PlayerHand.vue'
 import { mapGetters, mapState } from 'vuex'
 export default {
-  emits: ['play'],
   computed: {
     ...mapState('game', [
       'players',
@@ -27,17 +26,8 @@ export default {
       return h('div', { class: `game-layout for-${this.numberOfPlayers}-players` }, layout)
     }
 
-    const PlayerHandComponent = ({ number, horizontal }) => {
-      return h(
-        PlayerHandVue, 
-        { 
-          horizontal,
-          player: this.players[number],
-          isTurn: this.turn === number,
-          activeSuit: this.activeSuit,
-          onPlay: (payload) => this.$emit('play', payload), 
-        },
-      )
+    const PlayerHandComponent = ({ number: playerIndex, horizontal }) => {
+      return h(PlayerHandVue, { horizontal, playerIndex })
     }
 
     const FlexColumn = children => h('div', { class: 'flex-column'}, children)

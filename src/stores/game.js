@@ -16,13 +16,14 @@ const game = {
 
   getters: {
     winner: ({ players }) => getWinner(players),
-    activeSuit: ({ starter, players }) => starter?.suit ?? getActiveSuit(players),
+    activeSuit: ({ starter, players }) => getActiveSuit(starter, players),
     placedCards: ({ players }) => getPlacedCards(players),
     isGameOver: (_, { winner }) => winner !== null,
     haveAllPlaced: ({ players }) => haveAllPlaced(players),
-    currentPlayerShouldSkip: ({ deck, players, turn }) => playerShouldSkip(deck, players, turn),
-    currentPlayerShouldDig: ({ deck, players, turn }) => playerShouldDig(deck, players, turn),
-    currentPlayerShouldTake: ({ deck, players, turn }) => playerShouldTake(deck, players, turn),
+    currentPlayerShouldSkip: ({ starter, deck, players, turn }) => playerShouldSkip(starter, deck, players, turn),
+    currentPlayerShouldDig: ({ starter, deck, players, turn }) => playerShouldDig(starter, deck, players, turn),
+    currentPlayerShouldTake: ({ starter, deck, players, turn }) => playerShouldTake(starter, deck, players, turn),
+    getPlayerByIndex: ({ players }) => idx => players[idx] ?? null
   },
 
   mutations: {
@@ -54,7 +55,7 @@ const game = {
     },
 
     NEXT_TURN(state) {
-      state.turn = determineNextTurn(state.deck, state.players, state.turn)
+      state.turn = determineNextTurn(state.starter, state.deck, state.players, state.turn)
     },
 
     DIG_CARD(state) {

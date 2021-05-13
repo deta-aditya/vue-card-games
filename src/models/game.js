@@ -91,8 +91,6 @@ export function haveAllPlaced(players) {
 export function currentPlayWinnerIndex(players) {
   const rankedPlacedCards = players.map(player => RANKS.indexOf(player.placed?.rank))
 
-  console.log(rankedPlacedCards)
-
   const { playerIndex } = rankedPlacedCards.reduce((prev, current, idx) => {
     if (current > prev.card) {
       return { playerIndex: idx, card: current }
@@ -109,13 +107,13 @@ export function refreshPlayersPlaced(players) {
   return players.map(player => ({ ...player, placed: null }))
 }
 
-// determineNextTurn :: [Card] -> [Player] -> Int -> Int
-export function determineNextTurn(deck, players, turn) {
+// determineNextTurn :: Some Card -> [Card] -> [Player] -> Int -> Int
+export function determineNextTurn(starter, deck, players, turn) {
   const shouldLoopBack = turn === players.length - 1
   const nextTurn = shouldLoopBack ? 0 : turn + 1
   
-  if (playerShouldSkip(deck, players, nextTurn)) {
-    return determineNextTurn(deck, players, nextTurn)
+  if (playerShouldSkip(starter, deck, players, nextTurn)) {
+    return determineNextTurn(starter, deck, players, nextTurn)
   }
   
   return nextTurn
@@ -145,9 +143,9 @@ export function movePlacedToCurrentPlayer(players, turn) {
   return newPlayers
 }
 
-// playerShouldSkip :: [Card] -> [Player] -> Int -> Bool 
-export function playerShouldSkip(deck, players, turn) {
-  const activeSuit = getActiveSuit(players)
+// playerShouldSkip :: Some Card -> [Card] -> [Player] -> Int -> Bool 
+export function playerShouldSkip(starter, deck, players, turn) {
+  const activeSuit = getActiveSuit(starter, players)
   const deckExhausted = deck.length === 0
   const currentPlayer = players[turn]
   const onTakingPhase = activeSuit !== null && deckExhausted
@@ -158,26 +156,30 @@ export function playerShouldSkip(deck, players, turn) {
   return onTakingPhase && (currentPlayerWillTakeCard || currentPlayerAlreadyPlacedCard)
 }
 
-// playerShouldDig :: [Card] -> [Player] -> Int -> Bool
-export function playerShouldDig(deck, players, turn) {
-  const activeSuit = getActiveSuit(players)
+// playerShouldDig :: Some Card -> [Card] -> [Player] -> Int -> Bool
+export function playerShouldDig(starter, deck, players, turn) {
+  const activeSuit = getActiveSuit(starter, players)
   const deckExhausted = deck.length === 0
   const currentPlayer = players[turn]
 
   return activeSuit !== null && ! playerHasSuit(currentPlayer, activeSuit) && ! deckExhausted
 }
 
-// playerShouldTake :: [Card] -> [Player] -> Int -> Bool
-export function playerShouldTake(deck, players, turn) {
-  const activeSuit = getActiveSuit(players)
+// playerShouldTake :: Some Card -> [Card] -> [Player] -> Int -> Bool
+export function playerShouldTake(starter, deck, players, turn) {
+  const activeSuit = getActiveSuit(starter, players)
   const deckExhausted = deck.length === 0
   const currentPlayer = players[turn]
 
   return activeSuit !== null && ! playerHasSuit(currentPlayer, activeSuit) && deckExhausted
 }
 
-// getActiveSuit :: [Player] -> Some Suit
-export function getActiveSuit(players) {
+// getActiveSuit :: Some Card -> [Player] -> Some Suit
+export function getActiveSuit(starter, players) {
+  if (starter !== null) {
+    return starter.suit
+  }
+
   return players
     .map(player => player.placed)
     .reduce((prev, current) => current !== null ? current.suit : prev, null)

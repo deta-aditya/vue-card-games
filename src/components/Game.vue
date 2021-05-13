@@ -1,5 +1,5 @@
 <template>
-  <game-layout @play="cardPlayed">
+  <game-layout>
     <section class="game-table">
       <div v-show="!isGameOver" class="deck-placeholder">
         <button v-show="currentPlayerShouldDig" @click="digFromDeck">Dig!</button>
