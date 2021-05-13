@@ -1,4 +1,4 @@
-import { generateTurnRandomly, initializeDeck, initializePlayers, takeOneFromDeck } from '../models/game'
+import { currentPlayWinnerIndex, determineNextTurn, digFromDeck, generateTurnRandomly, getWinner, haveAllPlaced, initializeDeck, initializePlayers, movePlacedToCurrentPlayer, placeCard, refreshPlayersPlaced, takeOneFromDeck, playerShouldSkip, getActiveSuit, playerShouldDig, playerShouldTake, getPlacedCards } from '../models/game'
 
 const game = {
   namespaced: true,
@@ -15,7 +15,14 @@ const game = {
   },
 
   getters: {
-    takeFromDeck: state => count => state.deck.slice(0, count)
+    winner: ({ players }) => getWinner(players),
+    activeSuit: ({ starter, players }) => starter?.suit ?? getActiveSuit(players),
+    placedCards: ({ players }) => getPlacedCards(players),
+    isGameOver: (_, { winner }) => winner !== null,
+    haveAllPlaced: ({ players }) => haveAllPlaced(players),
+    currentPlayerShouldSkip: ({ deck, players, turn }) => playerShouldSkip(deck, players, turn),
+    currentPlayerShouldDig: ({ deck, players, turn }) => playerShouldDig(deck, players, turn),
+    currentPlayerShouldTake: ({ deck, players, turn }) => playerShouldTake(deck, players, turn),
   },
 
   mutations: {
@@ -36,17 +43,35 @@ const game = {
       state.deck = deck
     },
 
-    // addPlayer: state => state.players = [
-    //   ...state.players, 
-    //   `Player ${state.players.length + 1}`
-    // ],
-    
-    // removePlayer: (state, { at }) => 
-    //   state.players = state.players.filter((_, idx) => idx !== at),
+    PLACE_CARD(state, { card }) {
+      state.players[state.turn] = placeCard(state.players[state.turn], card)
+    },
+
+    NEXT_PLAY(state) {
+      state.turn = currentPlayWinnerIndex(state.players)
+      state.players = refreshPlayersPlaced(state.players)
+      state.starter = null
+    },
+
+    NEXT_TURN(state) {
+      state.turn = determineNextTurn(state.deck, state.players, state.turn)
+    },
+
+    DIG_CARD(state) {
+      const { deck, player } = digFromDeck(state.deck, state.players[state.turn])
+      state.players[state.turn] = player
+      state.deck = deck
+    },
+
+    TAKE_CARDS(state) {
+      state.players = movePlacedToCurrentPlayer(state.players, state.turn)
+    },
   },
 
   actions: {
-    startGame({ commit }, { rules, players }) {
+    startGame({ commit, rootState }) {
+      const { rules, players } = rootState.starting
+
       commit('INIT_GAME', { rules, players })
       
       if (rules.startFromDeck) {
@@ -54,7 +79,30 @@ const game = {
       }
     },
 
+    playCard({ commit, getters }, { card }) {
+      commit('PLACE_CARD', { card })
 
+      if (getters.isGameOver) {
+        return
+      } else if (getters.haveAllPlaced) {
+        commit('NEXT_PLAY')
+      } else {
+        commit('NEXT_TURN')
+      }
+    },
+
+    digFromDeck({ commit, getters }) {
+      commit('DIG_CARD')
+      
+      if (getters.currentPlayerShouldSkip) {
+        commit('NEXT_TURN')
+      }
+    },
+
+    takeFromPlaced({ commit }) {
+      commit('TAKE_CARDS')
+      commit('NEXT_PLAY')
+    },
   },
 }
 

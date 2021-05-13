@@ -1,21 +1,18 @@
 <script>
 import { h } from 'vue'
 import PlayerHandVue from './PlayerHand.vue'
+import { mapGetters, mapState } from 'vuex'
 export default {
-  props: {
-    players: Array,
-    turn: Number,
-    placed: Array,
-  },
   emits: ['play'],
   computed: {
-    activeSuit() {
-      const anyPlacedCard = this.placed.find(card => card !== null)
-      if (anyPlacedCard === undefined) {
-        return null
-      }
-      return anyPlacedCard.suit
-    },
+    ...mapState('game', [
+      'players',
+      'turn',
+    ]),
+
+    ...mapGetters('game', [
+      'activeSuit',
+    ]),
 
     numberOfPlayers() {
       return this.players.length
