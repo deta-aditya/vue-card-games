@@ -29,18 +29,22 @@ const mutations = {
   INIT_GAME(state, { rules, players: playerNames }) {
     const undistDeck = initializeDeck()
     const { deck, players } = initializePlayers(rules, undistDeck, playerNames)
-    const turn = generateTurnRandomly(players)
     
     state.rules = rules
     state.deck = deck
     state.players = players
-    state.turn = turn
   },
 
-  PLACE_STARTER(state) {
-    const { card, deck } = takeOneFromDeck(state.deck)
-    state.starter = card
-    state.deck = deck
+  START_GAME(state, { turn }) {
+    const { rules } = state
+
+    if (rules.startFromDeck) {
+      const { card, deck } = takeOneFromDeck(state.deck)
+      state.starter = card
+      state.deck = deck
+    }
+
+    state.turn = turn
   },
 
   PLACE_CARD(state, { card }) {
@@ -73,10 +77,10 @@ const actions = {
     const { rules, players } = rootState.starting
 
     commit('INIT_GAME', { rules, players })
-    
-    if (rules.startFromDeck) {
-      commit('PLACE_STARTER')
-    }
+
+    const turn = generateTurnRandomly(players)
+
+    commit('START_GAME', { turn })
   },
 
   playCard({ commit, getters }, { card }) {
